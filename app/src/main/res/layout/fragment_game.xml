@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/tv_left_number"
-        tools:text="1" />
+        tools:text="10" />
 
     <TextView
         android:id="@+id/tv_left_number"
@@ -80,7 +80,7 @@
         app:layout_constraintStart_toEndOf="@+id/tv_option_1"
         app:layout_constraintBottom_toBottomOf="@+id/tv_option_1"
         app:layout_constraintEnd_toStartOf="@+id/tv_option_3"
-        tools:text="1"
+        tools:text="3"
         />
 
     <TextView
