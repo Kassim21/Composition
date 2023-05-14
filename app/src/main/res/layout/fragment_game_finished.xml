@@ -11,7 +11,6 @@
         android:id="@+id/emoji_result"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="48dp"
         android:contentDescription="@string/game_over"
         app:layout_constraintBottom_toTopOf="@+id/tv_required_answer"
         app:layout_constraintEnd_toEndOf="parent"

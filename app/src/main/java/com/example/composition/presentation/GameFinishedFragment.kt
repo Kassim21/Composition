@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import com.example.composition.R
 import com.example.composition.databinding.FragmentGameFinishedBinding
 import com.example.composition.domain.entity.GameResult
 
@@ -37,6 +38,46 @@ class GameFinishedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        onBackPressedListener()
+        setSmileReaction()
+        setTextOnResult()
+    }
+
+    private fun setTextOnResult() {
+        binding.tvRequiredAnswer.text = String.format(
+            getString(R.string.right_answer_count),
+            gameResult.gameSettings.minCountOfRightAnswers
+        )
+        binding.tvScoreAnswers.text = String.format(
+            getString(R.string.score),
+            gameResult.countOfRightAnswers
+        )
+        binding.tvRequiredPercentage.text = String.format(
+            getString(R.string.required_percentage),
+            gameResult.gameSettings.minPercentOfRightAnswers
+        )
+        binding.tvScorePercentage.text = String.format(
+            getString(R.string.score_percentage),
+            getPercent()
+        )
+    }
+
+    private fun getPercent(): String {
+        return ((gameResult.countOfRightAnswers / gameResult.countOfQuestions.toDouble()) * 100)
+            .toInt()
+            .toString()
+    }
+
+    private fun setSmileReaction() {
+        val resultIdImage = if (gameResult.winner) {
+            R.drawable.smile_face
+        } else {
+            R.drawable.sad_face
+        }
+        binding.emojiResult.setImageResource(resultIdImage)
+    }
+
+    private fun onBackPressedListener() {
         val callback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 retryGame()
