@@ -12,18 +12,22 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.*
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.example.composition.R
 import com.example.composition.databinding.FragmentGameBinding
 import com.example.composition.domain.entity.Level
 
 class GameFragment : Fragment() {
 
-    private lateinit var level: Level
+    private val args by navArgs<GameFragmentArgs>()
+
+    private val viewModelFactory by lazy {
+//        val args = GameFragmentArgs.fromBundle(requireArguments()) - первый варик получить аргументы из фрагмента открывашки
+        GameViewModelFactory(args.level, requireActivity().application)
+    }
     private val viewModel by lazy {
-        ViewModelProvider(
-            this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        )[GameViewModel::class.java]
+        ViewModelProvider(this, viewModelFactory)[GameViewModel::class.java]
     }
 
     private val tvOptions by lazy {
@@ -41,11 +45,6 @@ class GameFragment : Fragment() {
     private val binding: FragmentGameBinding
         get() = _binding ?: throw RuntimeException("FragmentGameBinding == null")
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        parseArgs()
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -57,21 +56,19 @@ class GameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.startGame(level)
         setTimer()
         progressTracking()
         setValuesForOptions()
         setColorForProgress()
         optionsClickListener()
-        finishGame()
+        launchGameFinishedFragment()
     }
 
-    private fun finishGame() {
+    private fun launchGameFinishedFragment() {
         viewModel.gameResult.observe(viewLifecycleOwner) {
-            requireActivity().supportFragmentManager.beginTransaction()
-                .replace(R.id.main_container, GameFinishedFragment.newInstance(it))
-                .addToBackStack(null)
-                .commit()
+            findNavController().navigate(
+                GameFragmentDirections.actionGameFragmentToGameFinishedFragment(it)
+            )
         }
     }
 
@@ -105,7 +102,7 @@ class GameFragment : Fragment() {
         viewModel.minPercent.observe(viewLifecycleOwner) {
             binding.progressBar.secondaryProgress = it
         }
-        viewModel.percentOfRightAnswers.observe(viewLifecycleOwner){
+        viewModel.percentOfRightAnswers.observe(viewLifecycleOwner) {
             binding.progressBar.setProgress(it, true)
         }
         viewModel.progressAnswers.observe(viewLifecycleOwner) {
@@ -118,7 +115,7 @@ class GameFragment : Fragment() {
             with(binding) {
                 tvSum.text = it.sum.toString()
                 tvLeftNumber.text = it.visibleNumber.toString()
-                for(i in 0 until tvOptions.size){
+                for (i in 0 until tvOptions.size) {
                     tvOptions[i].text = it.options[i].toString()
                 }
             }
@@ -126,35 +123,29 @@ class GameFragment : Fragment() {
     }
 
     private fun optionsClickListener() {
-        for(tvOption in tvOptions){
+        for (tvOption in tvOptions) {
             tvOption.setOnClickListener {
                 viewModel.chooseAnswer(tvOption.text.toString().toInt())
             }
         }
     }
 
-    private fun parseArgs() {
-        requireArguments().parcelable<Level>(KEY_LEVEL)?.let {
-            level = it
-        }
-    }
+//    private inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
+//        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getParcelable(key, T::class.java)
+//        else -> @Suppress("DEPRECATION") getParcelable(key) as? T
+//    }
 
-    private inline fun <reified T : Parcelable> Bundle.parcelable(key: String): T? = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> getParcelable(key, T::class.java)
-        else -> @Suppress("DEPRECATION") getParcelable(key) as? T
-    }
-
-    companion object {
-
-        private const val KEY_LEVEL = "level"
-        const val NAME = "GameFragment"
-
-        fun newInstance(level: Level): GameFragment {
-            return GameFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(KEY_LEVEL, level)
-                }
-            }
-        }
-    }
+//    companion object {
+//
+//        const val KEY_LEVEL = "level"
+//        const val NAME = "GameFragment"
+//
+//        fun newInstance(level: Level): GameFragment {
+//            return GameFragment().apply {
+//                arguments = Bundle().apply {
+//                    putParcelable(KEY_LEVEL, level)
+//                }
+//            }
+//        }
+//    }
 }

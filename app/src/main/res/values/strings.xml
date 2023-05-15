@@ -14,7 +14,7 @@
     <string name="game_over">Game over</string>
     <string name="right_answer_count">Необходимое количество правильных ответов: %s</string>
     <string name="score">Ваш счёт: %s</string>
-    <string name="score_percentage">Процент правельных ответов: %s</string>
+    <string name="score_percentage">Процент правильных ответов: %s</string>
     <string name="required_percentage">необходимый процент правильных ответов: %s</string>
     <string name="try_again">Попробовать снова</string>
 </resources>
